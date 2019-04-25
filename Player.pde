@@ -1,42 +1,87 @@
+enum dir {
+  up,
+  down,
+  left,
+  right
+}
+
 class Player{
-  double xPos, yPos, ySpeed = 0, xSpeed = 0, walkSpeed;
+  double xPos, yPos, ySpeed = 0, xSpeed = 0, acc, maxSpeed = 1.0, gravity = 0.098;
   int weapon, number;
   boolean left = false, right = false, crouch = false;
   
-  Player(){
-    walkSpeed = 0.05;
+  boolean touchingGround = true;
+  
+  Game game;
+  
+  int pWidth = 10; // size in pixels
+  int pHeight = 10; // size in pixels
+  
+  Player(Game game){
+    this.game = game;
+    acc = 0.05;
   }
-  Player(int number, double speed){
+  
+  int getW() { return pWidth; }
+  int getH() { return pHeight; }
+  
+  double getX() { return xPos; }
+  double getY() { return yPos; }
+  
+  void setX(double x) { xPos = x; }
+  void setY(double y) { yPos = y; }
+  
+  Player(Game game, int number, double speed){
+    this.game = game;
     this.number = number;
-    walkSpeed = speed;
+    acc = speed;
   }
   
   void keyAction(boolean down, int val){
-      if(val == 'W' && down && collide(1)){ ySpeed += 1; }
+      if(val == 'W' && down && touchingGround){ ySpeed -= 4; touchingGround = false; }
       if(val == 'A'){ left = down; }
       if(val == 'S'){ crouch = down; }
       if(val == 'D'){ right = down; }
   }
   
-  boolean collide(int side){
-    
-    return false;
-  }
-  
   void update(){
-    if(left == true && xSpeed < 1){  xSpeed += walkSpeed;  }
-    if(left == false && xSpeed > 0){  xSpeed -= walkSpeed;  }
-    if(right == true && xSpeed > -1){  xSpeed -= walkSpeed;  }
-    if(right == false && xSpeed <= 0){  xSpeed += walkSpeed;  }
-    //if(!collide()){
+    if(right && xSpeed < maxSpeed){ xSpeed = Math.min(xSpeed + acc, maxSpeed);  }
+    if(!right && xSpeed > 0){  xSpeed = Math.max(xSpeed - acc, 0);  }
+    if(left && xSpeed > -maxSpeed){  xSpeed = Math.max(xSpeed - acc, -maxSpeed);  }
+    if(!left && xSpeed < 0){ xSpeed = Math.min(xSpeed + acc, 0);  }
+    
+    if (xSpeed != 0) {
+      xPos += xSpeed;
+      if (game.handleCollision(this, xSpeed < 0 ? dir.left : dir.right)) {
+        xSpeed = 0;
+      }
+    }
+    
+    ySpeed += gravity;
+    
+    if (ySpeed != 0) {
+      yPos += ySpeed;
       
-    //}
-    xPos += xSpeed;
+      if (ySpeed > 0) {
+        touchingGround = game.handleCollision(this, dir.down);
+        if (touchingGround) {
+          ySpeed = 0;
+        }
+      } else {
+        touchingGround = false;
+        if (game.handleCollision(this, dir.up)) {
+          ySpeed = 0;
+        }
+      }
+      
+    }
+    
+    System.out.println(touchingGround ? "touching" : "not touching");
     
   }
   
   void display(){
     fill(200,30,30);
-    rect((float)xPos, (float)yPos, 20.0, 20.0);
+    rect((float)xPos, (float)yPos, pWidth, pHeight);
   }
 }
