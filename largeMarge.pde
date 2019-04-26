@@ -1,22 +1,49 @@
-Game game;
+import processing.net.*;
+
+State state;
 Map map;
 
+void setState(State s) {
+  state = s;
+}
+
+Game gameState;
+Title titleState;
+Join joinState;
+
+PApplet parent = null;
+
+PFont f;
+
 void setup(){
+  
+  parent = this;
+  
+  titleState = new Title();
+  
   size(400,400);
-  game = new Game(2);
+  state = titleState;
   background(100,40,60);
+  f = createFont("Arial", 16);
 }
 
 void keyPressed(){
-  game.keyDown(keyCode);
-  System.out.println("one");
+  state.keyDown(keyCode);
 }
 
 void keyReleased(){
-  game.keyUp(keyCode);
+  state.keyUp(keyCode);
 }
 
 void draw(){
-  game.display();
-  game.update();
+  state.display();
+  state.update();
+}
+
+void serverEvent(Server server, Client client) {
+  System.out.println("sjfkdjsfl");
+}
+
+void disconnectEvent(Client someClient) {
+  System.out.println("Server Says:  ");
 }

@@ -1,5 +1,8 @@
-class Game{
-  Player[] players;
+class Game implements State {
+  
+  Server server = null;
+  
+  ArrayList<Player> players = new ArrayList();
   //Map feild = new Map();
   
   int[][] map = new int[][]{
@@ -13,17 +16,11 @@ class Game{
       {1,1,1,1,1,1,1,1}
    };
   
-  int tileSize = 20;
+  int tileSize = 50;
     
   Game(){
-    
-  }
-  
-  Game(int player){
-    this.players = new Player[player];
-    for(int i = 0; i < player; i++){
-      players[i] = new Player(this, i+1, .05);
-    }
+    players.add(new Player(this));
+    server = new Server(parent, 1337);
   }
   
   boolean handleCollision(Player p, dir direction){
@@ -59,21 +56,21 @@ class Game{
   }
   
   void update(){
-    players[0].update();
+    players.get(0).update();
   }
   
   void keyDown(int val){
-    players[0].keyAction(true, val);
+    players.get(0).keyAction(true, val);
   }
   
   void keyUp(int val){
-    players[0].keyAction(false, val);
+    players.get(0).keyAction(false, val);
   }
   
   void display(){
     clear();
     //feild.display();
-    players[0].display();
+    players.get(0).display();
     
     for(int i = 0; i < map.length; i++){
       for(int j = 0; j < map[i].length; j++){
@@ -83,6 +80,18 @@ class Game{
         }
       }
     }
+    
+    // Get the next available client
+    Client thisClient = server.available();
+    // If the client is not null, and says something, display what it said
+    if (thisClient !=null) {
+      String whatClientSaid = thisClient.readString();
+      if (whatClientSaid != null) {
+        text(thisClient.ip() + "t" + whatClientSaid, 10, 20);
+      } 
+    } 
+  
+    
   }
   
 }

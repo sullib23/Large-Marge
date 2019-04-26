@@ -6,7 +6,7 @@ enum dir {
 }
 
 class Player{
-  double xPos, yPos, ySpeed = 0, xSpeed = 0, acc, maxSpeed = 1.0, gravity = 0.098;
+  double xPos, yPos, ySpeed = 0, xSpeed = 0, acc, maxSpeed = 1.0, gravity = 0.098, jumpForce = 6;
   int weapon, number;
   boolean left = false, right = false, crouch = false;
   
@@ -38,7 +38,7 @@ class Player{
   }
   
   void keyAction(boolean down, int val){
-      if(val == 'W' && down && touchingGround){ ySpeed -= 4; touchingGround = false; }
+      if(val == 'W' && down && touchingGround){ ySpeed -= jumpForce; touchingGround = false; }
       if(val == 'A'){ left = down; }
       if(val == 'S'){ crouch = down; }
       if(val == 'D'){ right = down; }
@@ -75,8 +75,6 @@ class Player{
       }
       
     }
-    
-    System.out.println(touchingGround ? "touching" : "not touching");
     
   }
   
