@@ -12,6 +12,8 @@ class Player{
   
   boolean touchingGround = true;
   
+  Client client = null;
+  
   Game game;
   
   int pWidth = 10; // size in pixels

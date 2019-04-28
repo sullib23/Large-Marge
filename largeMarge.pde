@@ -1,7 +1,6 @@
 import processing.net.*;
 
 State state;
-Map map;
 
 void setState(State s) {
   state = s;
@@ -41,9 +40,14 @@ void draw(){
 }
 
 void serverEvent(Server server, Client client) {
-  System.out.println("sjfkdjsfl");
+  //System.out.println("sjfkdjsfl");
+  gameState.addPlayer(client);
 }
 
-void disconnectEvent(Client someClient) {
-  System.out.println("Server Says:  ");
+void disconnectEvent(Client client) {
+  
+  if (state == gameState) {
+    gameState.removePlayer(client);
+  }
+  
 }
