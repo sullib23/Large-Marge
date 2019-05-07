@@ -4,6 +4,7 @@ class Game implements State {
   
   ArrayList<Player> players = new ArrayList();
   //Map feild = new Map();
+  ArrayList<Bullet> bullets = new ArrayList();
   
   String serverIP = Server.ip();
   
@@ -21,6 +22,10 @@ class Game implements State {
         break;
       }
     }
+  }
+  
+  void addBullet(Bullet bullet) {
+    bullets.add(bullet);
   }
   
   ArrayList<String> map = new ArrayList();
@@ -70,10 +75,24 @@ class Game implements State {
     String playerCoords = "";
     for (int i = 0; i < players.size(); i++) {
       players.get(i).update();
-      playerCoords += players.get(i).getX() + "," + players.get(i).getY() + ";";
+      playerCoords += "p," +
+                      players.get(i).getX() + "," +
+                      players.get(i).getY() + "," +
+                      players.get(i).getHealth() + ";";
     }
     
-    server.write(playerCoords);
+    String bulletCoords = "";
+    for (int i = bullets.size(); i-- > 0;) { // loop backwards so we can delete stuff
+      if (bullets.get(i).update()) {
+        bulletCoords += "b," +
+                        bullets.get(i).x + "," +
+                        bullets.get(i).y + ";";
+      } else {
+        bullets.remove(i);
+      }
+    }
+    
+    server.write(playerCoords + bulletCoords);
     
     Client client = server.available();
     // If the client is not null, and says something, display what it said
@@ -128,6 +147,7 @@ class Game implements State {
     for(int i = 0; i < map.size(); i++){
       for(int j = 0; j < map.get(i).length(); j++){
         if(map.get(i).charAt(j) == '1'){
+          stroke(255, 200, 200);
           fill(100,100,255);
           rect(tileSize*j,tileSize*i,tileSize,tileSize);
         }
@@ -138,6 +158,11 @@ class Game implements State {
       players.get(i).display();
     }
     
+    for (int i = 0; i < bullets.size(); i++) {
+      bullets.get(i).display();
+    }
+    
+    fill(255, 0, 0);
     text("Host ip: " + serverIP, 10, 20);
   
     

@@ -10,7 +10,11 @@ class Player{
   int weapon, number;
   boolean left = false, right = false, crouch = false;
   
+  boolean direction; // true = left
+  
   boolean touchingGround = true;
+  
+  int health = 100;
   
   Client client = null;
   
@@ -30,6 +34,8 @@ class Player{
   double getX() { return xPos; }
   double getY() { return yPos; }
   
+  int getHealth() { return health; }
+  
   void setX(double x) { xPos = x; }
   void setY(double y) { yPos = y; }
   
@@ -40,10 +46,29 @@ class Player{
   }
   
   void keyAction(boolean down, int val){
-      if(val == 'W' && down && touchingGround){ ySpeed -= jumpForce; touchingGround = false; }
-      if(val == 'A'){ left = down; }
-      if(val == 'S'){ crouch = down; }
-      if(val == 'D'){ right = down; }
+    switch (val) {
+      case 'W':
+        if (down && touchingGround) {
+          ySpeed -= jumpForce;
+          touchingGround = false;
+        }
+        break;
+      case 'A':
+        left = down;
+        direction = true;
+        break;
+      case 'S':
+        crouch = down;
+        break;
+      case 'D':
+        right = down;
+        direction = false;
+        break;
+      case ' ':
+        double bulletX = direction ? (xPos-1) : (xPos+pWidth+1);
+        game.addBullet(new Bullet(bulletX, yPos, direction));
+        break;
+    }
   }
   
   void update(){
@@ -78,10 +103,21 @@ class Player{
       
     }
     
+    
+    for (int i = 0; i < game.bullets.size(); i++) {
+      Bullet b = game.bullets.get(i);
+      if (b.x >= xPos && b.y >= yPos && b.x <= xPos + pWidth && b.y <= yPos + pHeight) {
+        health--;
+      }
+    }
+    
   }
   
   void display(){
     fill(200,30,30);
+    stroke(0,0,0);
     rect((float)xPos, (float)yPos, pWidth, pHeight);
+      fill(255, 255, 0);
+      text(health, (float)xPos, (float)yPos - 10);
   }
 }
