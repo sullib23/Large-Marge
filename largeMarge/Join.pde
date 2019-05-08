@@ -1,13 +1,5 @@
 import java.util.Scanner;
 
-class Coord {
-  int x, y;
-  Coord(int x, int y) {
-    this.x = x;
-    this.y = y;
-  }
-}
-
 class CPlayer {
   int x, y;
   String health;
